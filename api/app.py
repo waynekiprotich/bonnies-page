@@ -8,12 +8,12 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
  
 database_url = os.getenv("DATABASE_URL")
-
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///memories.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
 
 db.init_app(app)
