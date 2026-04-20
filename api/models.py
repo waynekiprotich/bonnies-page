@@ -3,14 +3,13 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-
 class Memory(db.Model):
     __tablename__ = "memories"
 
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(120), nullable=False)
     quote = db.Column(db.Text, nullable=False)
-    image_url = db.Column(db.Text, nullable=True)
+    image_url = db.Column(db.Text, nullable=True) 
     is_text_only = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
