@@ -9,16 +9,15 @@ const MemoryForm = ({ onMemoryAdded }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState(null);
 
-  // 1. Convert Image File to Base64 String
+  // Convert image to Base64 to store in your Supabase 'image_url' column
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 4 * 1024 * 1024) { // 4MB Client-side check
-        alert("Photo is too large. Please use a smaller image (under 4MB).");
+      if (file.size > 4 * 1024 * 1024) { // 4MB Limit check
+        alert("Photo is too large for the sanctuary. Please use a smaller image.");
         e.target.value = null;
         return;
       }
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData({ ...formData, image: reader.result });
@@ -42,11 +41,9 @@ const MemoryForm = ({ onMemoryAdded }) => {
       if (response.ok) {
         setStatus('success');
         setFormData({ author: '', quote: '', image: '' });
-        // Refresh the list in Memories.jsx
-        if (onMemoryAdded) onMemoryAdded();
+        if (onMemoryAdded) onMemoryAdded(); // Refresh the list in Memories.jsx
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to share');
+        throw new Error('Failed to share');
       }
     } catch (err) {
       console.error("Submission error:", err);
@@ -57,38 +54,38 @@ const MemoryForm = ({ onMemoryAdded }) => {
   };
 
   return (
-    <div className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="w-full max-w-xl bg-surface p-8 rounded-3xl border border-outline-variant/20 shadow-sm">
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div>
-          <label className="block font-body text-sm uppercase tracking-widest text-stone-500 mb-2">Your Name</label>
+          <label className="block font-body text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-3">Your Name</label>
           <input
             required
             type="text"
-            className="w-full p-4 bg-stone-50 border-none rounded-lg focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+            className="w-full p-4 bg-surface-container-low border-b border-outline-variant focus:border-primary outline-none transition-all font-body text-primary"
             value={formData.author}
             onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-            placeholder="How should we address you?"
+            placeholder="E.g. Wayne"
           />
         </div>
 
         <div>
-          <label className="block font-body text-sm uppercase tracking-widest text-stone-500 mb-2">A Memory or Message</label>
+          <label className="block font-body text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-3">A Story for Bonnie</label>
           <textarea
             required
             rows="4"
-            className="w-full p-4 bg-stone-50 border-none rounded-lg focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+            className="w-full p-4 bg-surface-container-low border-b border-outline-variant focus:border-primary outline-none transition-all font-body text-primary resize-none"
             value={formData.quote}
             onChange={(e) => setFormData({ ...formData, quote: e.target.value })}
-            placeholder="Share a story about Bonnie..."
+            placeholder="Share a moment you cherish..."
           ></textarea>
         </div>
 
         <div>
-          <label className="block font-body text-sm uppercase tracking-widest text-stone-500 mb-2">Share a Photo (Optional)</label>
+          <label className="block font-body text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-3">Add a Photo</label>
           <input
             type="file"
             accept="image/*"
-            className="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"
+            className="w-full text-sm font-body text-on-surface-variant file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-tertiary-fixed-dim file:text-on-tertiary-fixed cursor-pointer"
             onChange={handleFileChange}
           />
         </div>
@@ -96,15 +93,15 @@ const MemoryForm = ({ onMemoryAdded }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-4 rounded-full font-body font-bold uppercase tracking-widest transition-all ${
-            isSubmitting ? 'bg-stone-200 text-stone-400' : 'bg-stone-900 text-white hover:bg-amber-900'
+          className={`w-full py-5 rounded-full font-headline text-lg italic transition-all duration-500 ${
+            isSubmitting ? 'bg-outline-variant text-surface cursor-wait' : 'bg-primary text-on-primary hover:scale-[1.02] active:scale-95 shadow-lg shadow-primary/10'
           }`}
         >
-          {isSubmitting ? 'Sharing...' : 'Share Memory'}
+          {isSubmitting ? 'Adding to the Sanctuary...' : 'Share Memory'}
         </button>
 
-        {status === 'success' && <p className="text-green-600 text-center font-body">Memory added to the sanctuary.</p>}
-        {status === 'error' && <p className="text-red-600 text-center font-body">Failed to share. Try a smaller photo.</p>}
+        {status === 'success' && <p className="text-primary font-body text-center animate-fade-in text-sm">Thank you. The memory has been preserved.</p>}
+        {status === 'error' && <p className="text-error font-body text-center text-sm">Connection failed. Please try a smaller photo.</p>}
       </form>
     </div>
   );
