@@ -1,7 +1,11 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from .models import db, Memory
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent))
+
+from models import db, Memory
 
 app = Flask(__name__)
 
