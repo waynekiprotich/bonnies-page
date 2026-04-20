@@ -53,3 +53,18 @@ def delete_memory(id):
     db.session.delete(memory)
     db.session.commit()
     return jsonify({"message": "Deleted"})
+
+@app.route("/api/memories", methods=["POST"])
+def add_memory():
+    try:
+        data = request.get_json()
+        # ... your logic ...
+        db.session.add(memory)
+        db.session.commit()
+        return jsonify({"message": "Success"}), 201
+    except Exception as e:
+        # THIS PINPOINTS IT:
+        print(f"CRITICAL ERROR: {str(e)}") 
+        import traceback
+        traceback.print_exc() # This prints the full error to Vercel logs
+        return jsonify({"error": "Server crashed", "details": str(e)}), 500
