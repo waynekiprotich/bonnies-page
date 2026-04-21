@@ -23,7 +23,7 @@ const Home = () => {
             <div className="flex flex-wrap gap-4 pt-4">
               <Link to="/memories" className="premium-gradient text-on-primary px-8 py-4 rounded-xl font-body font-semibold text-lg hover:scale-95 transition-transform duration-200 flex items-center gap-3 group">
                 View & Share Memories
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">&rarr;</span>
               </Link>
             </div>
           </div>

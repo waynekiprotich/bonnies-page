@@ -6,7 +6,6 @@ from models import db, Memory
 app = Flask(__name__)
 CORS(app)
 
-# DB config
 database_url = os.getenv("DATABASE_URL")
 
 if database_url and database_url.startswith("postgres://"):
@@ -16,6 +15,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///memories.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
+
 
 with app.app_context():
     db.create_all()
@@ -27,44 +27,39 @@ def get_memories():
 
 @app.route("/api/memories", methods=["POST"])
 def add_memory():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if not data.get("author") or not data.get("quote"):
-        return jsonify({"error": "Author and quote required"}), 400
+        if not data.get("author") or not data.get("quote"):
+            return jsonify({"error": "Author and quote required"}), 400
 
-    memory = Memory(
-        author=data["author"],
-        quote=data["quote"],
-        image_url=data.get("image"),
-        is_text_only=not bool(data.get("image"))
-    )
+        memory = Memory(
+            author=data["author"],
+            quote=data["quote"],
+            image_url=data.get("image"),
+            is_text_only=not bool(data.get("image"))
+        )
 
-    db.session.add(memory)
-    db.session.commit()
+        db.session.add(memory)
+        db.session.commit()
 
-    return jsonify(memory.to_dict()), 201
+        return jsonify(memory.to_dict()), 201
+
+    except Exception as e:
+        print("ERROR:", str(e))
+        return jsonify({"error": "Server error", "details": str(e)}), 500
 
 @app.route("/api/memories/<int:id>", methods=["DELETE"])
 def delete_memory(id):
     memory = Memory.query.get(id)
+
     if not memory:
         return jsonify({"error": "Not found"}), 404
 
     db.session.delete(memory)
     db.session.commit()
+
     return jsonify({"message": "Deleted"})
 
-@app.route("/api/memories", methods=["POST"])
-def add_memory():
-    try:
-        data = request.get_json()
-        # ... your logic ...
-        db.session.add(memory)
-        db.session.commit()
-        return jsonify({"message": "Success"}), 201
-    except Exception as e:
-        # THIS PINPOINTS IT:
-        print(f"CRITICAL ERROR: {str(e)}") 
-        import traceback
-        traceback.print_exc() # This prints the full error to Vercel logs
-        return jsonify({"error": "Server crashed", "details": str(e)}), 500
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

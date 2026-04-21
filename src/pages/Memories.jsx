@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import MemoryCard from '../components/MemoryCard';
 import MemoryForm from '../components/MemoryForm';
+import API_URL from '../config';
 
 const Memories = () => {
   // State to hold the memories from the database
@@ -11,19 +12,22 @@ const Memories = () => {
 
   // Function to fetch memories from your Flask backend
   const fetchMemories = async () => {
-    try {
-      const response = await fetch('/api/memories');
-      if (!response.ok) {
-        throw new Error('Failed to fetch memories');
-      }
-      const data = await response.json();
-      setMemories(data);
-      setIsLoading(false);
-    } catch (err) {
-      console.error("Error loading memories:", err);
-      setError(err.message);
-      setIsLoading(false);
+  try {
+    const response = await fetch(`${API_URL}/api/memories`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch memories');
     }
+
+    const data = await response.json();
+    setMemories(data);
+    setIsLoading(false);
+
+   } catch (err) {
+    console.error("Error loading memories:", err);
+    setError(err.message);
+    setIsLoading(false);
+   }
   };
 
   // Run the fetch function when the page loads
